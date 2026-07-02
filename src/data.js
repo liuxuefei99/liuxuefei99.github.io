@@ -12,6 +12,8 @@ import {
   Users,
 } from "lucide-react";
 
+const assetPath = (fileName) => `${import.meta.env.BASE_URL}assets/${fileName}`;
+
 export const profile = {
   name: "Xuefei Liu",
   chineseName: "刘雪飞",
@@ -19,7 +21,7 @@ export const profile = {
   focus: "计算生物学 | 单细胞与空间组学 | 肿瘤转移机制",
   location: "广东深圳",
   emails: ["12231372@mail.sustech.edu.cn", "liter_frye@163.com"],
-  portrait: "/assets/xuefei-liu.png",
+  portrait: assetPath("xuefei-liu.png"),
 };
 
 export const navTabs = [
@@ -206,35 +208,35 @@ export const team = [
     cn: "刘雪飞",
     role: "课题负责人",
     org: "南方科技大学",
-    image: "/assets/xuefei-liu.png",
+    image: assetPath("xuefei-liu.png"),
   },
   {
     name: "Chun Wu",
     cn: "吴纯",
     role: "基础实验",
     org: "中山大学肿瘤防治中心",
-    image: "/assets/wuchun.jpg",
+    image: assetPath("wuchun.jpg"),
   },
   {
     name: "Yixin Cheng",
     cn: "程一昕",
     role: "基础实验",
     org: "中山大学肿瘤防治中心",
-    image: "/assets/chengyx.jpg",
+    image: assetPath("chengyx.jpg"),
   },
   {
     name: "Guanyin Huang",
     cn: "黄官银",
     role: "生信分析",
     org: "南方科技大学",
-    image: "/assets/huanggy.jpg",
+    image: assetPath("huanggy.jpg"),
   },
   {
     name: "Lianhui Duan",
     cn: "段连慧",
     role: "生信分析",
     org: "清华大学",
-    image: "/assets/duanlh.jpg",
+    image: assetPath("duanlh.jpg"),
   },
 ];
 
