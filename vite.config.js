@@ -9,7 +9,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           react: ["react", "react-dom"],
-          three: ["three"],
           qrcode: ["qrcode"],
         },
       },

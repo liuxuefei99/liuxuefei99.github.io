@@ -65,7 +65,7 @@ export const cellModes = [
 ];
 
 export const metrics = [
-  { value: "256", label: "旧版主页统计总影响因子" },
+  { value: "256", label: "累计影响因子" },
   { value: "10+", label: "代表性论文与合作成果" },
   { value: "3", label: "单细胞 / 空间 / 转移方向" },
 ];

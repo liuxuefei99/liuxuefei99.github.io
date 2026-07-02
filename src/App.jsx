@@ -1,21 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import {
   ArrowUpRight,
+  Award,
+  BookOpenText,
   CalendarDays,
+  Dna,
+  FlaskConical,
+  GraduationCap,
   Mail,
   MapPin,
   Microscope,
-  Radio,
   ScanLine,
+  Users,
 } from "lucide-react";
-import CellUniverse from "./CellUniverse.jsx";
 import {
   awards,
-  cellModes,
   education,
   metrics,
-  navTabs,
   profile,
   projects,
   publications,
@@ -23,6 +25,37 @@ import {
   statusItems,
   team,
 } from "./data.js";
+
+const cellDots = Array.from({ length: 34 }, (_, index) => ({
+  id: index,
+  x: (index * 17 + 9) % 100,
+  y: (index * 29 + 11) % 100,
+  size: 10 + ((index * 7) % 30),
+  delay: (index % 8) * -0.7,
+  color: ["#38bdf8", "#2dd4bf", "#a3e635", "#f59e0b", "#818cf8"][index % 5],
+}));
+
+function AnimatedCells() {
+  return (
+    <div className="cell-field" aria-hidden="true">
+      {cellDots.map((cell) => (
+        <span
+          key={cell.id}
+          style={{
+            "--x": `${cell.x}%`,
+            "--y": `${cell.y}%`,
+            "--s": `${cell.size}px`,
+            "--d": `${cell.delay}s`,
+            "--c": cell.color,
+          }}
+        />
+      ))}
+      <i />
+      <i />
+      <i />
+    </div>
+  );
+}
 
 function QRPanel() {
   const [qrSrc, setQrSrc] = useState("");
@@ -32,70 +65,127 @@ function QRPanel() {
     const url = window.location.href;
     setPageUrl(url);
     QRCode.toDataURL(url, {
-      width: 192,
+      width: 168,
       margin: 1,
-      color: {
-        dark: "#111827",
-        light: "#f8fafc",
-      },
+      color: { dark: "#12324a", light: "#ffffff" },
     }).then(setQrSrc);
   }, []);
 
   return (
-    <div className="qr-block">
-      <div className="qr-heading">
-        <ScanLine size={18} />
+    <div className="qr-panel">
+      <div className="qr-title">
+        <ScanLine size={17} />
         <span>主页二维码</span>
       </div>
-      <div className="qr-frame">
-        {qrSrc ? <img src={qrSrc} alt="个人主页二维码" /> : <span />}
+      <div className="qr-content">
+        <div className="qr-frame">
+          {qrSrc ? <img src={qrSrc} alt="个人主页二维码" /> : <span />}
+        </div>
+        <p>{pageUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}</p>
       </div>
-      <p>{pageUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}</p>
     </div>
   );
 }
 
-function StatusStack() {
+function SectionHeading({ eyebrow, title, intro }) {
   return (
-    <div className="status-stack">
-      {statusItems.map((item) => {
-        const Icon = item.icon;
-        return (
-          <div className="status-row" key={item.label}>
-            <Icon size={17} />
-            <div>
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
-            </div>
-          </div>
-        );
-      })}
+    <div className="section-heading">
+      <span>{eyebrow}</span>
+      <h2>{title}</h2>
+      {intro ? <p>{intro}</p> : null}
     </div>
   );
 }
 
-function ProfilePanel() {
+function HeroProfileCard() {
   return (
-    <div className="tab-grid tab-grid-profile">
-      <article className="panel feature-panel">
-        <div className="panel-kicker">研究方向</div>
-        <h2>用细胞状态、空间位置和互作网络理解肿瘤转移。</h2>
-        <p>
-          我的研究结合单细胞转录组、空间组学和计算建模，关注肿瘤进展中的
-          肿瘤-内皮-免疫微环境互作，尤其是转移相关生态位的形成与演化。
+    <aside className="profile-card">
+      <img className="portrait" src={profile.portrait} alt="刘雪飞头像" />
+      <div className="profile-name">
+        <h2>{profile.chineseName}</h2>
+        <span>{profile.name}</span>
+      </div>
+      <p className="profile-title">{profile.title}</p>
+      <div className="profile-meta">
+        <a href={`mailto:${profile.emails[0]}`}>
+          <Mail size={17} />
+          {profile.emails[0]}
+        </a>
+        <a href={`mailto:${profile.emails[1]}`}>
+          <Mail size={17} />
+          {profile.emails[1]}
+        </a>
+        <span>
+          <MapPin size={17} />
+          {profile.location}
+        </span>
+      </div>
+      <QRPanel />
+    </aside>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="hero" id="home">
+      <HeroProfileCard />
+      <div className="hero-main">
+        <div className="hero-badge">
+          <Dna size={18} />
+          <span>单细胞空间组学 / 计算生物学</span>
+        </div>
+        <h1>
+          刘雪飞
+          <span>Xuefei Liu</span>
+        </h1>
+        <p className="hero-lede">{profile.focus}</p>
+        <p className="hero-summary">
+          目前关注单细胞转录组、空间组学与肿瘤微环境互作，尝试从细胞状态、
+          空间位置和分子通讯三个层面理解肿瘤转移过程。
         </p>
-        <div className="chip-cloud">
+        <div className="hero-actions">
+          <a className="primary-action" href={`mailto:${profile.emails[0]}`}>
+            <Mail size={18} />
+            联系我
+          </a>
+          <a href="#publications">
+            <BookOpenText size={18} />
+            查看论文
+          </a>
+        </div>
+        <div className="metric-grid">
+          {metrics.map((metric) => (
+            <div className="metric" key={metric.label}>
+              <strong>{metric.value}</strong>
+              <span>{metric.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Overview() {
+  return (
+    <section className="overview">
+      <article className="overview-panel research-panel">
+        <SectionHeading eyebrow="Research" title="研究方向" />
+        <p>
+          聚焦肿瘤转移、单细胞与空间组学、肿瘤-内皮-免疫互作，以及循环肿瘤细胞相关机制。
+        </p>
+        <div className="chip-list">
           {researchInterests.map((interest) => (
             <span key={interest}>{interest}</span>
           ))}
         </div>
       </article>
 
-      <article className="panel">
-        <div className="panel-kicker">教育经历</div>
+      <article className="overview-panel">
+        <SectionHeading eyebrow="Education" title="教育经历" />
         <div className="timeline">
           {education.map((item) => (
-            <div className="timeline-item" key={item.school}>
+            <div className="timeline-row" key={item.school}>
               <span />
               <div>
                 <h3>{item.school}</h3>
@@ -106,249 +196,180 @@ function ProfilePanel() {
           ))}
         </div>
       </article>
-    </div>
-  );
-}
 
-function PublicationsPanel() {
-  return (
-    <div className="publication-list">
-      {publications.map((paper) => {
-        const content = (
-          <>
-            <div className="paper-meta">
-              <span>{paper.journal}</span>
-              <span>{paper.year}</span>
-              <span>{paper.role}</span>
-            </div>
-            <h3>{paper.title}</h3>
-            <p>{paper.authors}</p>
-          </>
-        );
-
-        if (paper.href) {
-          return (
-            <a className="paper-card" href={paper.href} target="_blank" rel="noreferrer" key={paper.title}>
-              {content}
-              <ArrowUpRight size={18} />
-            </a>
-          );
-        }
-
-        return (
-          <article className="paper-card" key={paper.title}>
-            {content}
-          </article>
-        );
-      })}
-    </div>
-  );
-}
-
-function ProjectsPanel() {
-  return (
-    <div className="tab-grid">
-      <article className="panel">
-        <div className="panel-kicker">项目经历</div>
-        <div className="project-list">
-          {projects.map((project) => (
-            <div className="project-item" key={project.title}>
-              <div>
-                <h3>{project.title}</h3>
-                <p>{project.body}</p>
-              </div>
-              <div className="project-aside">
-                <strong>{project.years}</strong>
-                <span>{project.tag}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </article>
-
-      <article className="panel">
-        <div className="panel-kicker">荣誉奖励</div>
-        <div className="award-list">
-          {awards.map((award) => (
-            <div className="award-item" key={award}>
-              <span />
-              <p>{award}</p>
-            </div>
-          ))}
-        </div>
-      </article>
-    </div>
-  );
-}
-
-function TeamPanel() {
-  return (
-    <div className="team-grid">
-      {team.map((member) => (
-        <article className="team-card" key={member.name}>
-          <img src={member.image} alt={`${member.cn}头像`} />
-          <div>
-            <h3>
-              {member.cn}
-              <span>{member.name}</span>
-            </h3>
-            <p>{member.org}</p>
-            <strong>{member.role}</strong>
-          </div>
-        </article>
-      ))}
-    </div>
-  );
-}
-
-function TabPanel({ activeTab }) {
-  if (activeTab === "publications") return <PublicationsPanel />;
-  if (activeTab === "projects") return <ProjectsPanel />;
-  if (activeTab === "team") return <TeamPanel />;
-  return <ProfilePanel />;
-}
-
-const sectionTitles = {
-  profile: "个人学术主页",
-  publications: "代表性论文",
-  projects: "项目与荣誉",
-  team: "地下小分队",
-};
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState("profile");
-  const [cellMode, setCellMode] = useState("spatial");
-
-  const activeMode = useMemo(
-    () => cellModes.find((mode) => mode.id === cellMode) ?? cellModes[0],
-    [cellMode],
-  );
-
-  return (
-    <div className="site-shell">
-      <CellUniverse mode={cellMode} />
-      <header className="topbar">
-        <button className="brand-mark" type="button" onClick={() => setActiveTab("profile")}>
-          <span>XL</span>
-          <strong>刘雪飞</strong>
-        </button>
-        <nav className="nav-tabs" aria-label="主导航">
-          {navTabs.map((tab) => {
-            const Icon = tab.icon;
-            const selected = activeTab === tab.id;
+      <article className="overview-panel status-panel">
+        <SectionHeading eyebrow="Status" title="当前状态" />
+        <div className="status-list">
+          {statusItems.map((item) => {
+            const Icon = item.icon;
             return (
-              <button
-                className={selected ? "active" : ""}
-                type="button"
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                aria-pressed={selected}
-              >
-                <Icon size={17} />
-                <span>{tab.label}</span>
-              </button>
+              <div className="status-item" key={item.label}>
+                <Icon size={18} />
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </div>
+              </div>
             );
           })}
+        </div>
+      </article>
+    </section>
+  );
+}
+
+function Publications() {
+  return (
+    <section className="page-section" id="publications">
+      <SectionHeading
+        eyebrow="Publications"
+        title="代表性论文"
+        intro="保留英文题名和期刊名，方便学术检索；作者贡献和状态用中文说明。"
+      />
+      <div className="publication-grid">
+        {publications.map((paper) => {
+          const content = (
+            <>
+              <div className="paper-tags">
+                <span>{paper.journal}</span>
+                <span>{paper.year}</span>
+                <span>{paper.role}</span>
+              </div>
+              <h3>{paper.title}</h3>
+              <p>{paper.authors}</p>
+            </>
+          );
+
+          if (paper.href) {
+            return (
+              <a className="paper-card" href={paper.href} target="_blank" rel="noreferrer" key={paper.title}>
+                {content}
+                <ArrowUpRight size={18} />
+              </a>
+            );
+          }
+
+          return (
+            <article className="paper-card" key={paper.title}>
+              {content}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function ProjectsAwards() {
+  return (
+    <section className="page-section" id="projects">
+      <SectionHeading eyebrow="Projects & Awards" title="项目与荣誉" />
+      <div className="split-section">
+        <div className="project-list">
+          {projects.map((project) => (
+            <article className="project-card" key={project.title}>
+              <div className="project-topline">
+                <span>{project.years}</span>
+                <strong>{project.tag}</strong>
+              </div>
+              <h3>{project.title}</h3>
+              <p>{project.body}</p>
+            </article>
+          ))}
+        </div>
+
+        <div className="award-panel">
+          <div className="award-title">
+            <Award size={20} />
+            <h3>荣誉奖励</h3>
+          </div>
+          <div className="award-list">
+            {awards.map((award) => (
+              <div className="award-item" key={award}>
+                <span />
+                <p>{award}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Team() {
+  return (
+    <section className="page-section" id="team">
+      <SectionHeading
+        eyebrow="DX Team"
+        title="地下小分队"
+        intro="围绕基础实验、生信分析和课题设计协作推进，持续输出更扎实的研究结果。"
+      />
+      <div className="team-grid">
+        {team.map((member) => (
+          <article className="team-card" key={member.name}>
+            <img src={member.image} alt={`${member.cn}头像`} />
+            <div>
+              <h3>{member.cn}</h3>
+              <span>{member.name}</span>
+              <p>{member.org}</p>
+              <strong>{member.role}</strong>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function App() {
+  return (
+    <div className="site-shell">
+      <AnimatedCells />
+      <header className="topbar">
+        <a className="brand" href="#home">
+          <span>XL</span>
+          <strong>刘雪飞</strong>
+        </a>
+        <nav aria-label="主导航">
+          <a href="#home">
+            <GraduationCap size={17} />
+            主页
+          </a>
+          <a href="#publications">
+            <BookOpenText size={17} />
+            论文
+          </a>
+          <a href="#projects">
+            <FlaskConical size={17} />
+            项目
+          </a>
+          <a href="#team">
+            <Users size={17} />
+            团队
+          </a>
         </nav>
       </header>
 
       <main>
-        <section className="hero-section">
-          <div className="hero-copy">
-            <div className="presence-pill">
-              <span className="live-dot" />
-              <Radio size={16} />
-              <strong>正在构建肿瘤转移生态位图谱</strong>
-            </div>
-            <h1>
-              {profile.chineseName}
-              <span>{profile.name}</span>
-            </h1>
-            <p className="hero-lede">{profile.focus}</p>
-            <div className="hero-meta">
-              <span>
-                <Microscope size={18} />
-                {profile.title}
-              </span>
-              <span>
-                <MapPin size={18} />
-                {profile.location}
-              </span>
-              <span>
-                <CalendarDays size={18} />
-                南科大 生物学
-              </span>
-            </div>
-            <div className="hero-actions">
-              <a href={`mailto:${profile.emails[0]}`} className="primary-action">
-                <Mail size={18} />
-                联系我
-              </a>
-              <button type="button" onClick={() => setActiveTab("publications")}>
-                查看论文
-                <ArrowUpRight size={17} />
-              </button>
-            </div>
-            <div className="metric-strip">
-              {metrics.map((metric) => (
-                <div key={metric.label}>
-                  <strong>{metric.value}</strong>
-                  <span>{metric.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <aside className="identity-panel">
-            <div className="portrait-wrap">
-              <img src={profile.portrait} alt="Xuefei Liu portrait" />
-              <span className="portrait-glow" />
-            </div>
-            <div className="identity-text">
-              <span>博士研究生</span>
-              <h2>单细胞空间组学</h2>
-              <p>南方科技大学 | 计算生物学</p>
-            </div>
-            <StatusStack />
-            <QRPanel />
-          </aside>
-        </section>
-
-        <section className="mode-section">
-          <div className="mode-switcher" role="tablist" aria-label="细胞状态模式">
-            {cellModes.map((mode) => {
-              const Icon = mode.icon;
-              const selected = cellMode === mode.id;
-              return (
-                <button
-                  key={mode.id}
-                  type="button"
-                  className={selected ? "selected" : ""}
-                  onClick={() => setCellMode(mode.id)}
-                  aria-selected={selected}
-                  role="tab"
-                >
-                  <Icon size={18} />
-                  <span>{mode.label}</span>
-                </button>
-              );
-            })}
-          </div>
-          <article className="mode-detail">
-            <span>{activeMode.kicker}</span>
-            <h2>{activeMode.title}</h2>
-            <p>{activeMode.copy}</p>
-          </article>
-        </section>
-
-        <section className="content-tabs">
-          <div className="content-heading">
-            <span>{navTabs.find((tab) => tab.id === activeTab)?.label}</span>
-            <h2>{sectionTitles[activeTab]}</h2>
-          </div>
-          <TabPanel activeTab={activeTab} />
-        </section>
+        <Hero />
+        <Overview />
+        <Publications />
+        <ProjectsAwards />
+        <Team />
       </main>
+
+      <footer className="footer">
+        <span>© 2026 Xuefei Liu</span>
+        <span>
+          <CalendarDays size={16} />
+          Built as a fast static academic homepage
+        </span>
+        <span>
+          <Microscope size={16} />
+          Single-cell and spatial omics
+        </span>
+      </footer>
     </div>
   );
 }
